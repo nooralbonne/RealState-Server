@@ -1,4 +1,5 @@
 const express = require('express');
+const bodyParser = require('body-parser'); //
 const cors = require('cors');
 const axios = require('axios');
 const { Client } = require('pg');
@@ -9,6 +10,8 @@ const PORT = 3001;
 app.use(cors());
 // Use express.json() middleware to parse JSON bodies
 app.use(express.json());
+//bodyParser
+app.use(bodyParser.json());
 
 const dbUrl = 'postgres://btnaiatj:zrcWc6U_XYdMwiL2HCe4_kxWV6D2fCpk@bubble.db.elephantsql.com/btnaiatj';
 const client = new Client({
@@ -75,26 +78,34 @@ app.post('/addProperty', addPropertyHandler);
 app.get('/getProperty', getPropertyHandler);
 app.delete('/deleteProperty/:id', deletePropertyHandler);
 
-// Functions
+
 async function addPropertyHandler(req, res) {
   if (!req.body) {
+    console.error('Request body is missing');
     return res.status(400).send('Request body is missing');
   }
+
   const { name, image, price, details } = req.body;
+
   if (!name || !image || !price || !details) {
+    console.error('Missing required fields', { name, image, price, details });
     return res.status(400).send('Missing required fields');
   }
-  const sql = `INSERT INTO properties(name, image, price, details)
-               VALUES ($1, $2, $3, $4) RETURNING *;`;
+
+  const sql = `INSERT INTO properties(name, image, price, details) VALUES ($1, $2, $3, $4) RETURNING *;`;
   const values = [name, image, price, details];
+
   try {
     const result = await client.query(sql, values);
+    console.log('Insert result:', result.rows[0]);
     res.status(201).json(result.rows[0]);
   } catch (error) {
     console.error('Error executing query', error.stack);
     res.status(500).send('Error inserting data');
   }
 }
+
+
 
 async function getPropertyHandler(req, res) {
   const sql = 'SELECT * FROM properties';
