@@ -25,7 +25,7 @@ client.connect()
 const bayutBaseUrl = 'https://bayut.p.rapidapi.com/properties/list';
 const detailUrl = 'https://bayut.p.rapidapi.com/properties/detail';
 const autoCompleteUrl = 'https://bayut.p.rapidapi.com/auto-complete';
-const rapidAPIKey = '5abf4451eamshff071b22263f434p190578jsn571b46dc3437';
+const rapidAPIKey = '3b630041c2msh23a7541ce76c513p14f254jsne0fe74b1dd5a';
 
 const createOptions = (url, params) => ({
   method: 'GET',
