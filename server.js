@@ -15,15 +15,13 @@ app.use(express.json());
 app.use(bodyParser.json());
 
 //const dbUrl = 'postgres://btnaiatj:zrcWc6U_XYdMwiL2HCe4_kxWV6D2fCpk@bubble.db.elephantsql.com/btnaiatj';
-//const dbUrl = `postgres://noor:noora07878@localhost:5432/realstatedb`
-//const dbUrl = `postgres://noor:${process.env.DBPASSWORD}@localhost:5432/${process.env.DBNAME}`;
 //const dbUrl = `postgresql://triangle_real_state_user:iWv5YEgHbfbjRVjkLAnEwjmszAlY4Xfx@dpg-cv9md65ds78s73bqkhkg-a.oregon-postgres.render.com/triangle_real_state`
 
 
 const client = new Client({
   connectionString: process.env.DATABASE_URL,
   ssl: {
-    rejectUnauthorized: false, // ضروري لـ Render.com
+    rejectUnauthorized: false, 
   },
 });
 client.connect()
