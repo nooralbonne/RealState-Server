@@ -4,7 +4,8 @@ const cors = require('cors');
 const axios = require('axios');
 const { Client } = require('pg');
 const app = express();
-const PORT = 3001;
+require('dotenv').config();
+
 
 // Use cors middleware for handling cross-origin requests
 app.use(cors());
@@ -13,9 +14,17 @@ app.use(express.json());
 //bodyParser
 app.use(bodyParser.json());
 
-const dbUrl = 'postgres://btnaiatj:zrcWc6U_XYdMwiL2HCe4_kxWV6D2fCpk@bubble.db.elephantsql.com/btnaiatj';
+//const dbUrl = 'postgres://btnaiatj:zrcWc6U_XYdMwiL2HCe4_kxWV6D2fCpk@bubble.db.elephantsql.com/btnaiatj';
+//const dbUrl = `postgres://noor:noora07878@localhost:5432/realstatedb`
+//const dbUrl = `postgres://noor:${process.env.DBPASSWORD}@localhost:5432/${process.env.DBNAME}`;
+//const dbUrl = `postgresql://triangle_real_state_user:iWv5YEgHbfbjRVjkLAnEwjmszAlY4Xfx@dpg-cv9md65ds78s73bqkhkg-a.oregon-postgres.render.com/triangle_real_state`
+
+
 const client = new Client({
-  connectionString: dbUrl,
+  connectionString: process.env.DATABASE_URL,
+  ssl: {
+    rejectUnauthorized: false, // ضروري لـ Render.com
+  },
 });
 client.connect()
   .then(() => console.log('Connected to PostgreSQL'))
@@ -25,17 +34,18 @@ client.connect()
 const bayutBaseUrl = 'https://bayut.p.rapidapi.com/properties/list';
 const detailUrl = 'https://bayut.p.rapidapi.com/properties/detail';
 const autoCompleteUrl = 'https://bayut.p.rapidapi.com/auto-complete';
-const rapidAPIKey = '3b630041c2msh23a7541ce76c513p14f254jsne0fe74b1dd5a';
+//const rapidAPIKey = 'bf49742b06msh3ebf5dbb1739bcfp1a4e11jsnccdff129a557';
 
 const createOptions = (url, params) => ({
   method: 'GET',
   url,
   params,
   headers: {
-    'X-RapidAPI-Key': rapidAPIKey,
+    'X-RapidAPI-Key': process.env.rapidAPIKey, // Corrected the syntax here
     'X-RapidAPI-Host': 'bayut.p.rapidapi.com',
   },
 });
+
 
 app.get('/properties/list', async (req, res) => {
   const { locationExternalIDs, purpose, hitsPerPage } = req.query;
@@ -80,6 +90,8 @@ app.delete('/deleteProperty/:id', deletePropertyHandler);
 
 
 async function addPropertyHandler(req, res) {
+  console.log('Received request:', req.body);
+
   if (!req.body) {
     console.error('Request body is missing');
     return res.status(400).send('Request body is missing');
@@ -101,7 +113,8 @@ async function addPropertyHandler(req, res) {
     res.status(201).json(result.rows[0]);
   } catch (error) {
     console.error('Error executing query', error.stack);
-    res.status(500).send('Error inserting data');
+    res.status(500).json({ message: 'Server error' });
+
   }
 }
 
@@ -131,6 +144,6 @@ async function deletePropertyHandler(req, res) {
   }
 }
 
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+app.listen(process.env.PORT, () => {
+  console.log(`Server running on port ${process.env.PORT}`);
 });
